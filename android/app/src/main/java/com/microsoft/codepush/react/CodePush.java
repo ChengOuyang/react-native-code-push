@@ -11,14 +11,13 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.devsupport.DevInternalSettings;
-import com.facebook.react.devsupport.interfaces.DevSupportManager;
 import com.facebook.react.uimanager.ViewManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.NotActiveException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,7 +77,7 @@ public class CodePush implements ReactPackage {
 
         mCurrentInstance = this;
 
-        clearDebugCacheIfNeeded(null);
+        clearDebugCacheIfNeeded();
         initializeUpdateAfterRestart();
     }
 
@@ -121,20 +120,8 @@ public class CodePush implements ReactPackage {
         return publicKey;
     }
 
-    public void clearDebugCacheIfNeeded(ReactInstanceManager instanceManager) {
-        boolean isLiveReloadEnabled = false;
-
-        // Use instanceManager for checking if we use LiveRelaod mode. In this case we should not remove ReactNativeDevBundle.js file
-        // because we get error with trying to get this after reloading. Issue: https://github.com/Microsoft/react-native-code-push/issues/1272
-        if (instanceManager != null) {
-            DevSupportManager devSupportManager = instanceManager.getDevSupportManager();
-            if (devSupportManager != null) {
-                DevInternalSettings devInternalSettings = (DevInternalSettings)devSupportManager.getDevSettings();
-                isLiveReloadEnabled = devInternalSettings.isReloadOnJSChangeEnabled();
-            }
-        }
-
-        if (mIsDebugMode && mSettingsManager.isPendingUpdate(null) && !isLiveReloadEnabled) {
+    public void clearDebugCacheIfNeeded() {
+        if (mIsDebugMode && mSettingsManager.isPendingUpdate(null)) {
             // This needs to be kept in sync with https://github.com/facebook/react-native/blob/master/ReactAndroid/src/main/java/com/facebook/react/devsupport/DevSupportManager.java#L78
             File cachedDevBundle = new File(mContext.getFilesDir(), "ReactNativeDevBundle.js");
             if (cachedDevBundle.exists()) {
@@ -170,14 +157,6 @@ public class CodePush implements ReactPackage {
         } catch (Exception e) {
             throw new CodePushUnknownException("Error in getting binary resources modified time", e);
         }
-    }
-
-    public String getPackageFolder() {
-        JSONObject codePushLocalPackage = mUpdateManager.getCurrentPackage();
-        if (codePushLocalPackage == null) {
-            return null;
-        }
-        return mUpdateManager.getPackageFolderPath(codePushLocalPackage.optString("packageHash"));
     }
 
     @Deprecated

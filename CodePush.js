@@ -341,10 +341,10 @@ async function syncInternal(options = {}, syncStatusChangeCallback, downloadProg
 
   try {
     await CodePush.notifyApplicationReady();
-
+    
     syncStatusChangeCallback(CodePush.SyncStatus.CHECKING_FOR_UPDATE);
     const remotePackage = await checkForUpdate(syncOptions.deploymentKey, handleBinaryVersionMismatchCallback);
-
+    
     const doDownloadAndInstall = async () => {
       syncStatusChangeCallback(CodePush.SyncStatus.DOWNLOADING_PACKAGE);
       const localPackage = await remotePackage.download(downloadProgressCallback);
@@ -359,8 +359,8 @@ async function syncInternal(options = {}, syncStatusChangeCallback, downloadProg
 
       return CodePush.SyncStatus.UPDATE_INSTALLED;
     };
-
-    const updateShouldBeIgnored = remotePackage && (remotePackage.failedInstall && syncOptions.ignoreFailedUpdates);
+    
+    const updateShouldBeIgnored = remotePackage && (remotePackage.failedInstall && syncOptions.ignoreFailedUpdates) || remotePackage.packageHash == options.updateDialog.packageHash;
     if (!remotePackage || updateShouldBeIgnored) {
       if (updateShouldBeIgnored) {
           log("An update is available, but it is being ignored due to having been previously rolled back.");
@@ -388,6 +388,8 @@ async function syncInternal(options = {}, syncStatusChangeCallback, downloadProg
         let installButtonText = null;
 
         const dialogButtons = [];
+
+        remotePackage.isMandatory = true;
 
         if (remotePackage.isMandatory) {
           message = syncOptions.updateDialog.mandatoryUpdateMessage;
@@ -426,9 +428,11 @@ async function syncInternal(options = {}, syncStatusChangeCallback, downloadProg
         Alert.alert(syncOptions.updateDialog.title, message, dialogButtons);
       });
     } else {
+      debugger
       return await doDownloadAndInstall();
     }
   } catch (error) {
+    debugger
     syncStatusChangeCallback(CodePush.SyncStatus.UNKNOWN_ERROR);
     log(error.message);
     throw error;
@@ -542,7 +546,6 @@ if (NativeCodePush) {
     sync,
     disallowRestart: RestartManager.disallow,
     allowRestart: RestartManager.allow,
-    clearUpdates: NativeCodePush.clearUpdates,
     InstallMode: {
       IMMEDIATE: NativeCodePush.codePushInstallModeImmediate, // Restart the app immediately
       ON_NEXT_RESTART: NativeCodePush.codePushInstallModeOnNextRestart, // Don't artificially restart the app. Allow the update to be "picked up" on the next app restart

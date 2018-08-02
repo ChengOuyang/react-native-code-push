@@ -18,8 +18,6 @@ Constructs the CodePush client runtime and represents the `ReactPackage` instanc
 
 - __CodePush(String deploymentKey, Context context, boolean isDebugMode, Integer publicKeyResourceDescriptor)__ - Equivalent to the previous constructor, but allows you to specify the public key resource descriptor needed to read public key content. Please refer to [Code Signing](setup-android.md#code-signing) section for more details about Code Signing Feature.
 
-- __CodePush(String deploymentKey, Context context, boolean isDebugMode, String serverUrl)__ Constructor allows you to specify CodePush Server Url. The Default value: `"https://codepush.azurewebsites.net/"` is overridden by value specfied in `serverUrl`. 
-
 ##### Builder
 
 As an alternative to constructors *you can also use `CodePushBuilder`* to setup a CodePush instance configured with *only parameters you want*.
@@ -32,7 +30,6 @@ As an alternative to constructors *you can also use `CodePushBuilder`* to setup 
             new CodePushBuilder("deployment-key-here",getApplicationContext())
                 .setIsDebugMode(BuildConfig.DEBUG)
                 .setPublicKeyResourceDescriptor(R.string.publicKey)
-                .setServerUrl("https://yourcodepush.server.com")
                 .build() //return configured CodePush instance
       );
     }
@@ -59,7 +56,5 @@ As an alternative to constructors *you can also use `CodePushBuilder`* to setup 
 - __getBundleUrl()__ - Returns the path to the most recent version of your app's JS bundle file, assuming that the resource name is `index.android.bundle`. If your app is using a different bundle name, then use the overloaded version of this method which allows specifying it. This method has the same resolution behavior as the Objective-C equivalent described above.
 
 - __getBundleUrl(String bundleName)__ - Returns the path to the most recent version of your app's JS bundle file, using the specified resource name (e.g. `index.android.bundle`). This method has the same resolution behavior as the Objective-C equivalent described above.
-
-- __getPackageFolder()__ - Returns the path to the current update folder.
 
 - __overrideAppVersion(String appVersionOverride)__ - Sets the version of the application's binary interface, which would otherwise default to the Play Store version specified as the `versionName` in the `build.gradle`. This should be called a single time, before the CodePush instance is constructed.
