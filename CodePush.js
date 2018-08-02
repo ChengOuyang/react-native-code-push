@@ -360,7 +360,10 @@ async function syncInternal(options = {}, syncStatusChangeCallback, downloadProg
       return CodePush.SyncStatus.UPDATE_INSTALLED;
     };
     
-    const updateShouldBeIgnored = remotePackage && (remotePackage.failedInstall && syncOptions.ignoreFailedUpdates) || remotePackage.packageHash == options.updateDialog.packageHash;
+    let updateShouldBeIgnored = remotePackage && (remotePackage.failedInstall && syncOptions.ignoreFailedUpdates);
+    if (Platform.OS === "android") {
+      updateShouldBeIgnored = updateShouldBeIgnored || remotePackage.packageHash == options.updateDialog.packageHash
+    }
     if (!remotePackage || updateShouldBeIgnored) {
       if (updateShouldBeIgnored) {
           log("An update is available, but it is being ignored due to having been previously rolled back.");
