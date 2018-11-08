@@ -392,7 +392,7 @@ async function syncInternal(options = {}, syncStatusChangeCallback, downloadProg
 
         const dialogButtons = [];
 
-        remotePackage.isMandatory = true;
+        // remotePackage.isMandatory = true;
 
         if (remotePackage.isMandatory) {
           message = syncOptions.updateDialog.mandatoryUpdateMessage;
