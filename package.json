@@ -111,5 +111,5 @@
     }
   },
   "typings": "typings/react-native-code-push.d.ts",
-  "version": "5.3.3"
+  "version": "5.3.4"
 }
