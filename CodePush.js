@@ -362,7 +362,7 @@ async function syncInternal(options = {}, syncStatusChangeCallback, downloadProg
     
     let updateShouldBeIgnored = remotePackage && (remotePackage.failedInstall && syncOptions.ignoreFailedUpdates);
     if (Platform.OS === "android") {
-      updateShouldBeIgnored = updateShouldBeIgnored || remotePackage.packageHash == options.updateDialog.packageHash
+      updateShouldBeIgnored = updateShouldBeIgnored || remotePackage == null || remotePackage.packageHash == options.updateDialog.packageHash
     }
     if (!remotePackage || updateShouldBeIgnored) {
       if (updateShouldBeIgnored) {
